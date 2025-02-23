@@ -18,7 +18,7 @@
 #include "mathlib/math_pfns.h"
 
 // For MMX intrinsics
-#include <xmmintrin.h>
+#include <intrin.h>
 
 // XXX remove me
 #undef clamp

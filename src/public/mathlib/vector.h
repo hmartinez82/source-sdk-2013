@@ -24,7 +24,7 @@
 
 #ifndef _X360
 // For MMX intrinsics
-#include <xmmintrin.h>
+#include <intrin.h>
 #endif
 
 #include "tier0/dbg.h"

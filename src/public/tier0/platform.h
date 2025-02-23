@@ -55,6 +55,14 @@
 
 #ifdef _WIN32
 #pragma once
+#include <intrin.h>
+#define ARM64_SYSREG(op0, op1, crn, crm, op2) \
+        ( ((op0 & 1) << 14) | \
+          ((op1 & 7) << 11) | \
+          ((crn & 15) << 7) | \
+          ((crm & 15) << 3) | \
+          ((op2 & 7) << 0) )
+#define ARM64_PMCCNTR_EL0       ARM64_SYSREG(3,3, 9,13,0)  // Cycle Count Register [CP15_PMCCNTR]
 #endif
 
 // feature enables
@@ -1229,7 +1237,7 @@ PLATFORM_INTERFACE struct tm *		Plat_gmtime( const time_t *timep, struct tm *res
 PLATFORM_INTERFACE time_t			Plat_timegm( struct tm *timeptr );
 PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *result );
 
-#if defined( _WIN32 ) && defined( _MSC_VER ) && ( _MSC_VER >= 1400 )
+#if defined( _WIN32 ) && defined( _MSC_VER ) && ( _MSC_VER >= 1400 ) && !defined( _M_ARM64 ) && !defined( _M_ARM64EC )
 	extern "C" unsigned __int64 __rdtsc();
 	#pragma intrinsic(__rdtsc)
 #endif
@@ -1238,6 +1246,8 @@ inline uint64 Plat_Rdtsc()
 {
 #if defined( _X360 )
 	return ( uint64 )__mftb32();
+#elif defined( _M_ARM64 ) || defined( _M_ARM64EC )
+	return _ReadStatusReg(ARM64_PMCCNTR_EL0);
 #elif defined( _WIN64 )
 	return ( uint64 )__rdtsc();
 #elif defined( _WIN32 )
